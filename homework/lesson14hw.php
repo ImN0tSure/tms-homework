@@ -10,6 +10,7 @@ function sayHello()
 {
     print_r("Привет!");
 }
+
 sayHello();
 
 hr();
@@ -23,6 +24,7 @@ function sumOfTwoNums(int $num1, int $num2)
 {
     return $num1 + $num2;
 }
+
 print_r(sumOfTwoNums(1, 2));
 
 hr();
@@ -36,6 +38,7 @@ function hiUser(string $user_name = "your name here")
 {
     echo "HI $user_name!\n";
 }
+
 hiUser("JACK");
 
 hr();
@@ -45,8 +48,7 @@ hr();
 print_r("Задание 4.");
 br();
 
-$anon_multiplier_by_two = function ($num) : int
-{
+$anon_multiplier_by_two = function ($num): int {
     return $num * 2;
 };
 
@@ -59,7 +61,7 @@ hr();
 print_r("Задание 5.");
 br();
 
-$arrow_multiplier_by_two = fn($num) : int => $num * 2;
+$arrow_multiplier_by_two = fn($num): int => $num * 2;
 
 echo $arrow_multiplier_by_two(6);
 
@@ -71,23 +73,19 @@ print_r("Задание 6.");
 br();
 
 $array = [
-    'layer1' => [0,1,2],
-    'layer2' => ['layer2.2' => [3,4,5],6,7],
+    'layer1' => [0, 1, 2],
+    'layer2' => ['layer2.2' => [3, 4, 5], 6, 7],
     'layer3' => 8,
     9
 ];
 
-function returnArrayValues ($array)
+function returnArrayValues($array)
 {
-    if (is_array($array))
-    {
-        foreach ($array as $value)
-        {
+    if (is_array($array)) {
+        foreach ($array as $value) {
             returnArrayValues($value);
         }
-    }
-    else
-    {
+    } else {
         echo $array . ' ';
     }
 }
@@ -101,7 +99,7 @@ hr();
 print_r("Задание 7.");
 br();
 
-function numPlusOne ($num) : int
+function numPlusOne($num): int
 {
     return $num += 1;
 }
@@ -147,7 +145,7 @@ echo 'ARRAY_PUSH, ARRAY_POP:<br><br>Было: ';
 print_r($array);
 br();
 
-array_push($array,'Утка');
+array_push($array, 'Утка');
 echo 'array_push() Утка: ';
 print_r($array);
 br();
@@ -162,7 +160,7 @@ br();
 echo 'ARRAY_MERGE:';
 br();
 $array1 = ['P', 'E', 'A', 'C', 'E'];
-$array2= ['D', 'E', 'A', 'T', 'H'];
+$array2 = ['D', 'E', 'A', 'T', 'H'];
 
 echo "Массив 1: ";
 print_r($array1);
@@ -190,26 +188,18 @@ $boooolean = TRUE;
 
 $mix = [$string, $num, $array, $boooolean];
 
-foreach ($mix as $var)
-{
-    if (is_string($var))
-    {
+foreach ($mix as $var) {
+    if (is_string($var)) {
         echo "$var – строка";
         br();
-    }
-    elseif (is_numeric($var))
-    {
+    } elseif (is_numeric($var)) {
         echo "$var – числовое значение";
         br();
-    }
-    elseif (is_array($var))
-    {
+    } elseif (is_array($var)) {
         print_r($var);
         echo " – массив";
         br();
-    }
-    else
-    {
+    } else {
         var_dump($var);
         echo " – не строка, не числовое значение, не массив";
         br();
@@ -272,3 +262,4 @@ echo "день месяц год, день недели, часы:минуты: 
 print_r(date('d M Y, D, H:i'));
 hr();
 //</editor-fold>
+
