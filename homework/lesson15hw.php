@@ -269,10 +269,9 @@ function isArraySorted($array): bool
 
 function bubbleSortArr(array $array, bool $order = true): array
 {
-    $counter = 0;
-    while (isArraySorted($array) !== true) {
-        for ($i = 0; $i < count($array) - 1 - $counter; $i++)
-        {
+
+    for ($j = 0; $j < count($array) - 1; $j++) {
+        for ($i = 0; $i < count($array) - 1 - $j; $i++) {
             $buffer_array = array_splice($array, $i); // Вырезает ещё не пройдённую часть массива в буферный массив.
             $elems_to_switch = array_splice($buffer_array, 0, 2); // Из буферного массива вырезаются 2 первых элемента.
             if (!isArraySorted($elems_to_switch)) // Проверяется, отсортированны ли 2 первых элемента по возрастанию.
@@ -282,16 +281,11 @@ function bubbleSortArr(array $array, bool $order = true): array
             $buffer_array = array_merge($elems_to_switch, $buffer_array); // Вставляет ранее вырезанные элементы в начало буферного массива.
             $array = array_merge($array, $buffer_array); // Вставляет буферный массив в конец уже пройденной части.
         }
-
-        $counter++;
     }
 
-    if ($order)
-    {
+    if ($order) {
         return $array;
-    }
-    else
-    {
+    } else {
         return array_reverse($array);
     }
 }
@@ -304,6 +298,8 @@ echo "Итоговый массив<br>";
 print_r(bubbleSortArr($array2));
 
 hr();
+
+
 //</editor-fold>
 
 ?>
