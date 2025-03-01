@@ -15,7 +15,7 @@ $error = [];
 switch ($_POST['action']) {
 
     case 'registration':
-
+//Блок проверок
         if ($login_empty_cond || $pass_empty_cond) {
             $error[] =
                 [
@@ -32,7 +32,7 @@ switch ($_POST['action']) {
         $login = htmlspecialchars($_POST['login']);
         $password = htmlspecialchars($_POST['pass']);
 
-        if (file_exists('./lesson19hw-users/' . $login . '.json')) {
+        if (file_exists('./lesson19hw-users/users/' . $login . '.json')) {
             $error[] =
                 [
                     'code' => '1',
@@ -72,14 +72,15 @@ switch ($_POST['action']) {
             }
 
             $avatar_size = $_FILES['avatar']['size'];
-            if ($avatar_size > 10*1024*1024) {
+            if ($avatar_size > 10 * 1024 * 1024) {
                 $error[] = [
                     'code' => '5',
                     'text' => 'avatar size must be less than 10 MB'
                 ];
             }
         }
-
+//Конец блока проверок
+//Блок регистрации пользователя
         if (empty($error)) {
             //create user
             $user_avatar = 'someone.jpg';
@@ -95,14 +96,18 @@ switch ($_POST['action']) {
             $user_data = [
                 'login' => $login,
                 'password' => $password_hash,
-                'avatar' => $user_avatar
+                'avatar' => $user_avatar,
+                'status' => 'user'
             ];
 
-            file_put_contents('./lesson19hw-users/' . $login . '.json', json_encode($user_data));
+//Устанавливаем доп. параметры для статуса пользователя.
+            $add_get = setUserStatus($login, 'user');
+
+            file_put_contents('./lesson19hw-users/users/' . $login . '.json', json_encode($user_data));
 
             $result = true;
         }
-
+//Конец блока регистрации пользователя
 
         print_r($error);
 
@@ -126,13 +131,15 @@ switch ($_POST['action']) {
         $login = htmlspecialchars($_POST['login']);
         $password = htmlspecialchars($_POST['pass']);
 
-        if (file_exists('./lesson19hw-users/' . $login . '.json')) {
+        if (file_exists('./lesson19hw-users/users/' . $login . '.json')) {
 
-            $user_data = file_get_contents('./lesson19hw-users/' . $login . '.json');
+            $user_data = file_get_contents('./lesson19hw-users/users/' . $login . '.json');
             $user_data = json_decode($user_data, true);
 
             if (password_verify($password, $user_data['password'])) {
                 $result = true;
+                $status = $user_data['status'];
+                $add_get = setUserStatus($login, $status);
             }
 
         }
@@ -155,5 +162,9 @@ switch ($_POST['action']) {
 }
 
 if ($result) {
-    header('Location: success.php?user=' . $login);
+    $redirect_to = 'Location: success.php?user=' . $login;
+    if (isset($add_get)) {
+        $redirect_to = 'Location: success.php?' . $add_get;
+    }
+    header($redirect_to);
 }

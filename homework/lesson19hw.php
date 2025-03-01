@@ -2,10 +2,14 @@
 ini_set('MEMORY_LIMIT', '128M');
 include_once '../addons/functions.php';
 
+if (isset($_GET['user']) && isset($_GET['status']) && isset($_GET['confirm'])) {
+    $add_get = '?user='.$_GET['user'].'&status='.$_GET['status'].'&confirm='.$_GET['confirm'];
+    header('Location: http://tms-hw.local/addons/cabinet.php' . $add_get);
+}
+
 $action = 'Авторизуйтесь, или <a href="?action=registration">зарегистрируйтесь</a>';
 $btn_action = 'authorisation';
 $btn_desc = 'Authorise';
-
 
 if (isset($_GET['action'])) {
     $action = 'Придумайте логин и пароль для регистрации';
