@@ -2,6 +2,7 @@
 ini_set('MEMORY_LIMIT', '128M');
 include_once '../addons/functions.php';
 
+//Проверяем статус пользователя.
 $add_get = checkUserStatus();
 
 if (isset($_GET['user'])) {

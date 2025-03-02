@@ -6,16 +6,18 @@ if ($_SERVER['REQUEST_METHOD'] != 'POST') {
     die();
 }
 
+//Для простоты чтения создаём условия для проверки заполненности полей логина и пароля.
 $login_empty_cond = (!isset($_POST['login']) || empty($_POST['login']));
 $pass_empty_cond = (!isset($_POST['pass']) || empty($_POST['pass']));
 
 $result = false;
 $error = [];
 
+//В зависимости от action, регистрируем, или авторизуем пользователя.
 switch ($_POST['action']) {
 
     case 'registration':
-//Блок проверок
+//<editor-fold desc="Проверки">
         if ($login_empty_cond || $pass_empty_cond) {
             $error[] =
                 [
@@ -79,8 +81,9 @@ switch ($_POST['action']) {
                 ];
             }
         }
-//Конец блока проверок
-//Блок регистрации пользователя
+//</editor-fold>
+
+//<editor-fold desc="Регистрация">
         if (empty($error)) {
             //create user
             $user_avatar = 'someone.jpg';
@@ -100,14 +103,14 @@ switch ($_POST['action']) {
                 'status' => 'user'
             ];
 
-//Устанавливаем доп. параметры для статуса пользователя.
+            //Устанавливаем доп. параметры для статуса пользователя, чтобы он был сразу авторизован.
             $add_get = setUserStatus($login, 'user');
 
             file_put_contents('./lesson19hw-users/users/' . $login . '.json', json_encode($user_data));
 
             $result = true;
         }
-//Конец блока регистрации пользователя
+//</editor-fold>
 
         print_r($error);
 
@@ -139,6 +142,8 @@ switch ($_POST['action']) {
             if (password_verify($password, $user_data['password'])) {
                 $result = true;
                 $status = $user_data['status'];
+
+                //Устанавливаем доп. параметры для статуса пользователя.
                 $add_get = setUserStatus($login, $status);
             }
 
@@ -163,8 +168,11 @@ switch ($_POST['action']) {
 
 if ($result) {
     $redirect_to = 'Location: success.php?user=' . $login;
+
+//Если установлены доп. параметры, то перенаправляем пользователя вместе с ними на страницу "успех".
     if (isset($add_get)) {
         $redirect_to = 'Location: success.php?' . $add_get;
     }
+
     header($redirect_to);
 }

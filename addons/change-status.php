@@ -22,7 +22,6 @@ foreach ($_POST as $key => $value) {
             file_put_contents('./lesson19hw-users/waffles/sessions.json', json_encode($tmp_data));
         }
     }
-
 }
 
 header('Location: success.php?' . $add_get);

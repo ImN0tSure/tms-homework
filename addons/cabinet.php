@@ -2,6 +2,7 @@
 ini_set('MEMORY_LIMIT', '128M');
 include_once '../addons/functions.php';
 
+//Проверяем статус пользователя.
 $add_get = checkUserStatus();
 
 $user = $_GET['user'];
@@ -21,6 +22,7 @@ br();
 echo '<a href=http://tms-hw.local/homework/lesson19hw.php?status=guest>Выйти из кабинета</a>';
 br();
 
+//<editor-fold desc="Блок, который видит только администратор">
 if ($status == 'admin') {
     $all_users = scandir('./lesson19hw-users/users/');
 
@@ -47,4 +49,5 @@ if ($status == 'admin') {
     </form>
     <?php
 }
+//</editor-fold>
 ?>
