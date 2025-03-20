@@ -64,7 +64,7 @@ switch ($_POST['action']) {
         }
 
         if (!empty($_FILES['avatar']['name'])) {
-            print_r('ITS WORK');
+
             $avatar_name = basename($_FILES['avatar']['name']);
             if (!preg_match("#^.+\.(jpg|jpeg|png)$#", $avatar_name)) {
                 $error[] = [
