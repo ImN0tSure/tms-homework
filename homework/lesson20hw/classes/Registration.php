@@ -21,6 +21,13 @@ class Registration
 //    Проверяем логин на соответствие формату e-mail при помощи регулярного выражения, а также свободен данный логин, или нет.
     public function checkLogin()
     {
+        if (strlen($this->user_data['login']) > 15) {
+            $this->error[] =
+                [
+                    'code' => '1.0',
+                    'text' => 'login must be 15 characters long'
+                ];
+        }
 
         if (!preg_match('#^[a-z0-9._-]+@[a-z0-9-]+\.[a-z]{1,4}$#', $this->user_data['login'])) {
             $this->error[] =
@@ -93,12 +100,7 @@ class Registration
 //    Регистрируем пользователя.
     public function registerNewUser()
     {
-
-        if (!empty($this->error)) {
-            $response_data['response'] = $this->response;
-            $response_data['error'] = $this->error;
-        } else {
-
+        if (empty($this->error)) {
             $this->saveAvatar();
             $this->user_data['password'] = password_hash($this->user_data['password'], PASSWORD_DEFAULT);
             file_put_contents('../users/' . $this->user_data['login'] . '.json', json_encode($this->user_data));
@@ -108,8 +110,11 @@ class Registration
             $_SESSION['username'] = $this->user_data['login'];
             $_SESSION['is_authorized'] = true;
 
-            $response_data['response'] = $this->response;
+            return $this->response;
         }
+
+        $response_data['response'] = $this->response;
+        $response_data['error'] = $this->error;
 
         return $response_data;
     }

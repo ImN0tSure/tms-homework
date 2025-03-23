@@ -3,16 +3,22 @@ session_start();
 ini_set('MEMORY_LIMIT', '128M');
 include_once '../../../addons/functions.php';
 require_once '../classes/User.php';
+require_once '../classes/UserAdmin.php';
 require_once '../classes/Registration.php';
 require_once '../classes/Authorisation.php';
+
+if (!$_SESSION['is_authorized']) {
+    header('Location: index.php');
+}
 
 //Проверяем статус пользователя.
 $user = new User();
 $status = $user->getStatus();
+if ($status === 'admin') {
+    $user = new UserAdmin();
+}
 
 echo 'Добро пожаловать в личный кабинет, ' . $user->getUsername();
-br();
-echo 'Ваш статус: ' . $status;
 br();
 
 echo 'Вот ваша аватарка<br> <img style="max-width: 300px; max-height: 300px;" src ="' . $user->getAvatarImg() . '"><br>';
@@ -22,33 +28,38 @@ echo '<form action="../addons/form-handler.php" method="POST">
     </form>
 ';
 br();
+if (isset($_POST['action'])) {
+    switch ($_POST['action']) {
+        case 'get-user-list':
+            echo $user->listAllUsers();
 
-//<editor-fold desc="Блок, который видит только администратор">
-if ($status == 'admin') {
-    $all_users = scandir('../users/');
+            break;
 
-    $inputs = '';
+        case 'get-user-info':
+            print_r($user->getUserInfo($_POST['user-name']));
+            break;
 
-    foreach ($all_users as $key => $user) {
-        if ($key < 2) {
-            continue;
-        }
-
-        $data = file_get_contents('../users/' . $user);
-        $data = json_decode($data, true);
-
-        $username = $data['login'];
-        $user_status = $data['status'];
-        $inputs .= '<br>' . $username . '<br><input type="text" name=" ' . $username . '" value="' . $user_status . '"><br>';
+        default:
+            break;
     }
-
-    ?>
-    <form action="../addons/change-status.php" method="post">
-        <?= $inputs ?>
-        <br>
-        <button type="submit">Подтвердить</button>
-    </form>
-    <?php
 }
-//</editor-fold>
+
+switch ($status) {
+    case 'admin':
+        $inputs = '
+            <button type="submit" name="action" value="get-user-list">Список всех пользователей</button>
+            <br><br>
+            <input type="text" name="user-name">
+            <br>
+            <button type="submit" name="action" value="get-user-info">Информация о пользователе</button>
+        ';
+        break;
+
+    default:
+        $inputs = '<button type="submit" name="action" value="get-user-info">Информация о пользователе</button>';
+}
 ?>
+    <form method="POST">
+    <?= $inputs ?>
+    </form>
+<?php

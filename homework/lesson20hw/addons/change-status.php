@@ -2,17 +2,13 @@
 session_start();
 ini_set('MEMORY_LIMIT', '128M');
 include_once '../../../addons/functions.php';
+require_once '../classes/UserAdmin.php';
 
-
-foreach ($_POST as $key => $value) {
-    $key = str_replace('_', '.', $key);
-    if (file_exists('../users/' . $key . '.json')) {
-        $data = file_get_contents('../users/' . $key . '.json');
-        $data = json_decode($data, true);
-        $data['status'] = $value;
-
-        file_put_contents('../users/' . $key . '.json', json_encode($data));
-    }
+$user = new UserAdmin();
+if ($user->getStatus() === 'admin') {
+    $user->changeUserStatus();
+    header('Location: ../pages/success.php');
 }
 
-header('Location: ../pages/success.php');
+header('Location: ../pages/cabinet.php');
+
