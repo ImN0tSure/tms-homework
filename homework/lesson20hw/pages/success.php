@@ -5,7 +5,7 @@ include_once '../../../addons/functions.php';
 require_once '../classes/User.php';
 
 //Проверяем статус пользователя.
-$user = new User;
+$user = User::getInstance();
 
 if ($user->getStatus() === 'guest') {
     header ("Location: ../index.php");

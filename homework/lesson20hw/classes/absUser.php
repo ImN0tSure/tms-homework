@@ -6,8 +6,10 @@ abstract class absUser implements iUser
     private string $user_status = '';
     private string $avatar_img;
 
+    private static $instance = null;
+
 //    Проверяем, если пользователь не авторизован, ставим ему статус guest, иначе загружаем его данные из "БД".
-    public function __construct() {
+    private function __construct() {
         if (!isset($_SESSION['is_authorized']) || $_SESSION['is_authorized'] !== true) {
             $this->user_status = 'guest';
         } else {
@@ -31,4 +33,12 @@ abstract class absUser implements iUser
     public function getStatus(): string {
         return $this->user_status;
     }
+
+    public static function getInstance() {
+        if (static::$instance === null) {
+            static::$instance = new static();
+        }
+        return static::$instance;
+    }
+
 }

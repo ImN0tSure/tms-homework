@@ -8,4 +8,6 @@ interface iUser
 
     public function getStatus(): string;
 
+    public static function getInstance();
+
 }

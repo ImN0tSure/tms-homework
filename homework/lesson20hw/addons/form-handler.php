@@ -15,21 +15,19 @@ $avatar_data = !empty($_FILES['avatar']['name']) ? $_FILES : [];
 switch ($_POST['action']) {
     case 'registration':
         $registration = (new Registration($login, $password, $avatar_data))
-            ->checkLogin()
-            ->checkPassword()
-            ->checkAvatar()
             ->registerNewUser();
 
         if ($registration['response']) {
             header('Location: ../pages/success.php');
+        } else
+        {
+            print_r($registration);
         }
         break;
 
     case 'authorization':
 
         $authorization = (new Authorization($login, $password))
-            ->checkLogin()
-            ->checkPassword()
             ->authorizeUser();
 
         var_dump($authorization);
@@ -44,6 +42,7 @@ switch ($_POST['action']) {
     case 'logout':
         unset($_SESSION['username']);
         unset($_SESSION['is_authorized']);
+        unset($_SESSION['status']);
 
         header('Location: ../pages/success.php');
 
