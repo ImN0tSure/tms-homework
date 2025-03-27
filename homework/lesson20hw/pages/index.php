@@ -1,6 +1,6 @@
 <?php
 session_start();
-var_dump($_SESSION);
+
 ini_set('MEMORY_LIMIT', '128M');
 include_once '../../../addons/functions.php';
 require_once '../classes/User.php';
@@ -8,7 +8,7 @@ require_once '../classes/Registration.php';
 require_once '../classes/Authorisation.php';
 
 //Проверяем, если пользователь авторизован, то перенаправляем его в личный кабинет.
-$user = new User();
+$user = User::getInstance();
 if ($user->getStatus() !== 'guest') {
     header('Location: ./cabinet.php');
 }

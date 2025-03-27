@@ -11,12 +11,14 @@ if (!$_SESSION['is_authorized']) {
     header('Location: index.php');
 }
 
+$status = $_SESSION['status'];
 //Проверяем статус пользователя.
-$user = new User();
-$status = $user->getStatus();
 if ($status === 'admin') {
-    $user = new UserAdmin();
+    $user = UserAdmin::getInstance();
+} else {
+    $user = User::getInstance();
 }
+
 
 echo 'Добро пожаловать в личный кабинет, ' . $user->getUsername();
 br();
@@ -36,7 +38,12 @@ if (isset($_POST['action'])) {
             break;
 
         case 'get-user-info':
-            print_r($user->getUserInfo($_POST['user-name']));
+            if (isset($_POST['user-name'])) {
+                print_r($user->getUserInfo($_POST['user-name']));
+            } else {
+                print_r($user->getUserInfo());
+            }
+
             break;
 
         default:

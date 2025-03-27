@@ -100,6 +100,8 @@ class Registration
 //    Регистрируем пользователя.
     public function registerNewUser()
     {
+        $this->checkLogin()->checkPassword()->checkAvatar();
+
         if (empty($this->error)) {
             $this->saveAvatar();
             $this->user_data['password'] = password_hash($this->user_data['password'], PASSWORD_DEFAULT);
@@ -109,8 +111,9 @@ class Registration
 
             $_SESSION['username'] = $this->user_data['login'];
             $_SESSION['is_authorized'] = true;
+            $_SESSION['status'] = 'user';
 
-            return $this->response;
+           $this->response = true;
         }
 
         $response_data['response'] = $this->response;

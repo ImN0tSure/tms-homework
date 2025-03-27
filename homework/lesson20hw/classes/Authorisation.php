@@ -51,12 +51,15 @@ class Authorization
 //    Авторизуем пользователя, записывая в сессию его логин и авторизацию.
     public function authorizeUser()
     {
+        $this->checkLogin()->checkPassword();
+
         if (!empty($this->error)) {
             $response_data['response'] = $this->response;
             $response_data['error'] = $this->error;
         } else {
             $_SESSION['username'] = $this->user_data['login'];
             $_SESSION['is_authorized'] = true;
+            $_SESSION['status'] = $this->user_data['status'];
 
             $response_data['response'] = true;
         }
