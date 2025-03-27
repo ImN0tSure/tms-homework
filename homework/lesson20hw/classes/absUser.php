@@ -22,6 +22,10 @@ abstract class absUser implements iUser
         }
     }
 
+    private function __clone() {}
+
+    private function __wakeup() {}
+
     public function getUsername(): string {
         return $this->username;
     }
