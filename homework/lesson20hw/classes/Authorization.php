@@ -1,5 +1,7 @@
 <?php
 
+namespace classes;
+
 class Authorization
 {
     private bool $response = false;
