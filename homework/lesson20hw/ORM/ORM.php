@@ -8,21 +8,22 @@ abstract class ORM
 {
     protected static ?PDO $db = null;
 
-    public function __construct()
+    protected static string $table;
+
+    private static ?ORM $instance = null;
+
+    protected function __construct()
     {
         if (self::$db === null) {
             self::$db = require_once 'config.php';
         }
     }
 
-    public function setTable($table): void
-    {
-        static::$table = $table;
-    }
+    abstract static protected function setTable();
 
-    public static function all()
+    public static function all(): array
     {
-        $stmt = static::$db->prepare('SELECT * FROM ' . static::$table);
+        $stmt = self::$db->prepare('SELECT * FROM ' . static::$table);
         $stmt->execute();
 
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -30,7 +31,7 @@ abstract class ORM
 
     public static function selectById(int $id)
     {
-        $stmt = static::$db->prepare('SELECT * FROM ' . static::$table . ' WHERE id = :id');
+        $stmt = self::$db->prepare('SELECT * FROM ' . static::$table . ' WHERE id = :id');
         $stmt->execute(['id' => $id]);
 
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -46,9 +47,9 @@ abstract class ORM
      */
     public static function selectWhere(array $where): array
     {
-        $condition = static::prepareWhereCondition($where);
+        $condition = self::prepareWhereCondition($where);
 
-        $stmt = static::$db->prepare('SELECT * FROM ' . static::$table . ' WHERE ' . $condition);
+        $stmt = self::$db->prepare('SELECT * FROM ' . static::$table . ' WHERE ' . $condition);
         $stmt->execute($where);
 
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -67,11 +68,11 @@ abstract class ORM
         $columns = implode(', ', array_keys($data));
         $values = ':' . implode(', :', array_keys($data));
 
-        $stmt = static::$db
+        $stmt = self::$db
             ->prepare('INSERT INTO ' . static::$table . ' (' . $columns . ') VALUES (' . $values . ')');
         $stmt->execute($data);
 
-        return static::$db->lastInsertId();
+        return self::$db->lastInsertId();
     }
 
     /*
@@ -104,9 +105,9 @@ abstract class ORM
 
         $set = implode(',', $prepared_data);
 
-        $condition = is_array($where) ? static::prepareWhereCondition($where) : $where;
+        $condition = is_array($where) ? self::prepareWhereCondition($where) : $where;
 
-        $stmt = static::$db->prepare('UPDATE ' . static::$table . ' SET ' . $set . ' WHERE ' . $condition);
+        $stmt = self::$db->prepare('UPDATE ' . self::$table . ' SET ' . $set . ' WHERE ' . $condition);
         return $stmt->execute(array_merge($data, $where));
     }
 
@@ -122,7 +123,16 @@ abstract class ORM
 
     public function getTable(): string
     {
-        return static::$table;
+        return self::$table;
+    }
+
+    public static function getInstance(): ORM
+    {
+        if (is_null(self::$instance)) {
+            self::$instance = new static();
+        }
+        static::setTable();
+        return self::$instance;
     }
 
 }

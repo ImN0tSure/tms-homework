@@ -1,44 +1,62 @@
 <?php
+
+namespace classes;
+
+use ORM\Users as TableUsers;
+use ORM\UserInfo as TableUserInfo;
+
 require_once 'absUser.php';
+
 class UserAdmin extends absUser
 {
-    public function getUserInfo($username): array {
-        if (!file_exists('../users/' . $username . '.json')) {
-            return ['error' =>
-                [
-                    'code' => 1,
-                    'message' => 'User does not exist'
-                ]
+    private array $current_statuses = [];
+
+    public function getUserInfo($username): array
+    {
+        $search_user = TableUsers::getInstance()->selectWhere(['login' => $username]);
+
+        if (!$search_user) {
+            return [
+                'error' =>
+                    [
+                        'code' => 1,
+                        'message' => 'User does not exist'
+                    ]
             ];
         }
 
-        $user_data = json_decode(file_get_contents('../users/' . $username . '.json'), true);
+        $search_user_info = TableUserInfo::getInstance()->selectWhere(['user_id' => $search_user[0]['id']]);
 
         return [
-            'user_name' => $user_data['login'],
-            'user_avatar' => $user_data['avatar_img'],
-            'user_status' => $user_data['status'],
+            'login' => $search_user[0]['login'],
+            'email' => $search_user_info[0]['email'],
+            'avatar_img' => $search_user_info[0]['avatar_img'],
+            'status' => $search_user_info[0]['status'],
         ];
     }
 
-    public function changeUserStatus() {
-        foreach ($_POST as $key => $value) {
-            $key = str_replace('_', '.', $key);
-            if (file_exists('../users/' . $key . '.json')) {
-                $data = file_get_contents('../users/' . $key . '.json');
-                $data = json_decode($data, true);
-                $data['status'] = $value;
-
-                file_put_contents('../users/' . $key . '.json', json_encode($data));
+    public function changeUserStatus()
+    {
+        foreach ($_POST as $id => $new_status) {
+            if($this->current_statuses[$id] != $new_status) {
+                TableUserInfo::getInstance()->update(['status' => $new_status], ['user_id' => $id]);
             }
         }
     }
 
-    public function listAllUsers() {
-        $all_users = scandir('../users/');
+    public function listAllUsers()
+    {
+        $all_users = TableUsers::getInstance()->all();
+        $all_user_info = TableUserInfo::getInstance()->all();
 
         $inputs = '';
         $form = '
+            <p>
+                0 - Администратор<br>
+                1 - Пользователь<br>
+                2 - Покемон<br>
+                3 - *Здесь может быть ваш статус<br>
+            </p>
             <form action="../addons/change-status.php" method="post">
                 **$inputs**
                 <br>
@@ -46,17 +64,18 @@ class UserAdmin extends absUser
             </form>
         ';
 
-        foreach ($all_users as $key => $user) {
-            if ($key < 2) {
-                continue;
-            }
+        foreach ($all_users as $key => $user_data) {
+            $username = $user_data['login'];
+            $user_id = $user_data['id'];
+            $user_status = $all_user_info[$key]['status'];
+            $inputs .= '<br>' . $username . '<br>
+                <input 
+                    type="text"
+                    name=" ' . $user_id . '"
+                    value="' . $user_status . '"
+                ><br>';
 
-            $data = file_get_contents('../users/' . $user);
-            $data = json_decode($data, true);
-
-            $username = $data['login'];
-            $user_status = $data['status'];
-            $inputs .= '<br>' . $username . '<br><input type="text" name=" ' . $username . '" value="' . $user_status . '"><br>';
+            $this->current_statuses[$user_id] = $user_status;
         }
 
         return str_replace('**$inputs**', $inputs, $form);

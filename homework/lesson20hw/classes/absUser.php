@@ -1,5 +1,13 @@
 <?php
-require_once '../classes/iUser.php';
+
+namespace classes;
+
+use ORM\Users as TableUsers;
+use ORM\UserInfo as TableUserInfo;
+
+require_once 'iUser.php';
+session_start();
+
 abstract class absUser implements iUser
 {
     private string $username;
@@ -9,36 +17,45 @@ abstract class absUser implements iUser
     private static $instance = null;
 
 //    Проверяем, если пользователь не авторизован, ставим ему статус guest, иначе загружаем его данные из "БД".
-    private function __construct() {
+    private function __construct()
+    {
         if (!isset($_SESSION['is_authorized']) || $_SESSION['is_authorized'] !== true) {
             $this->user_status = 'guest';
         } else {
-            $user_data = file_get_contents('../users/' . $_SESSION['username'] . '.json');
-            $user_data = json_decode($user_data, true);
+            $this->username = TableUsers::getInstance()->selectById($_SESSION['user_id'])[0]['login'];
 
-            $this->username = $user_data['login'];
-            $this->avatar_img = '../avatars/' . $user_data['avatar_img'];
-            $this->user_status = $user_data['status'];
+            $user_info = TableUserInfo::getInstance()->selectWhere(['user_id' => $_SESSION['user_id']])[0];
+
+            $this->user_status = $user_info['status'];
+            $this->avatar_img = $user_info['avatar_img'];
         }
     }
 
-    private function __clone() {}
+    private function __clone()
+    {
+    }
 
-    private function __wakeup() {}
+    private function __wakeup()
+    {
+    }
 
-    public function getUsername(): string {
+    public function getUsername(): string
+    {
         return $this->username;
     }
 
-    public function getAvatarImg(): string {
+    public function getAvatarImg(): string
+    {
         return $this->avatar_img;
     }
 
-    public function getStatus(): string {
+    public function getStatus(): string
+    {
         return $this->user_status;
     }
 
-    public static function getInstance() {
+    public static function getInstance()
+    {
         if (static::$instance === null) {
             static::$instance = new static();
         }
