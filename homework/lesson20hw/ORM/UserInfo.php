@@ -6,15 +6,17 @@ require_once 'ORM.php';
 
 class UserInfo extends ORM
 {
-    private static ?UserInfo $instance = null;
-    protected static string $table;
+//    private static ?UserInfo $instance = null;
+//    protected static string $table;
 
-    private function __construct()
+    public function __construct()
     {
         parent::__construct();
-        self::setTable('user_info');
     }
 
+    protected static function setTable(): void {
+        static::$table = 'user_info';
+    }
     private function __clone()
     {
     }
@@ -23,11 +25,4 @@ class UserInfo extends ORM
     {
     }
 
-    public static function getInstance(): ?UserInfo
-    {
-        if (is_null(self::$instance)) {
-            self::$instance = new UserInfo();
-        }
-        return self::$instance;
-    }
 }

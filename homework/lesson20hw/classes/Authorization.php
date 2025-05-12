@@ -2,10 +2,16 @@
 
 namespace classes;
 
+use ORM\Users as TableUsers;
+use ORM\UserInfo as TableUserInfo;
+
+require_once '../ORM/Users.php';
+require_once '../ORM/UserInfo.php';
+
 class Authorization
 {
     private bool $response = false;
-    private array $user_data;
+    private array $user_data = [];
     private array $error;
     private string $entered_login;
     private string $entered_password;
@@ -19,16 +25,14 @@ class Authorization
 //    Проверяем логин на соответствие формату e-mail при помощи регулярного выражения, а также существует данный логин, или нет.
     public function checkLogin()
     {
-
         if (!preg_match('#^[a-z0-9._-]+@[a-z0-9-]+\.[a-z]{1,4}$#', $this->entered_login)) {
             $this->setError();
         }
 
-        if (!file_exists('../users/' . $this->entered_login . '.json')) {
+        $this->user_data = TableUsers::getInstance()->selectWhere(['login' => $this->entered_login]);
+
+        if (!$this->user_data) {
             $this->setError();
-        } else {
-            $data = file_get_contents('../users/' . $this->entered_login . '.json');
-            $this->user_data = json_decode($data, true);
         }
 
         return $this;
@@ -41,7 +45,7 @@ class Authorization
             return $this;
         }
 
-        $verify_password = password_verify($this->entered_password, $this->user_data['password']);
+        $verify_password = password_verify($this->entered_password, $this->user_data[0]['password_hash']);
 
         if (!$verify_password) {
             $this->setError();
@@ -59,9 +63,10 @@ class Authorization
             $response_data['response'] = $this->response;
             $response_data['error'] = $this->error;
         } else {
-            $_SESSION['username'] = $this->user_data['login'];
+            $_SESSION['user_id'] = $this->user_data[0]['id'];
             $_SESSION['is_authorized'] = true;
-            $_SESSION['status'] = $this->user_data['status'];
+            $_SESSION['user_status'] = TableUserInfo::getInstance()
+                ->selectWhere(['user_id' => $this->user_data[0]['id']])[0]['status'];
 
             $response_data['response'] = true;
         }
