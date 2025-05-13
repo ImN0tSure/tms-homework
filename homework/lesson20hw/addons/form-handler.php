@@ -1,6 +1,12 @@
 <?php
+
+namespace project;
+
+use classes\Authorization as Authorization;
+use classes\Registration as Registration;
+
 session_start();
-require_once '../classes/Authorisation.php';
+require_once '../classes/Authorization.php';
 require_once '../classes/Registration.php';
 
 if ($_SERVER['REQUEST_METHOD'] != 'POST') {
@@ -19,8 +25,7 @@ switch ($_POST['action']) {
 
         if ($registration['response']) {
             header('Location: ../pages/success.php');
-        } else
-        {
+        } else {
             print_r($registration);
         }
         break;
@@ -30,8 +35,6 @@ switch ($_POST['action']) {
         $authorization = (new Authorization($login, $password))
             ->authorizeUser();
 
-        var_dump($authorization);
-        print_r($_SESSION);
 
         if ($authorization['response']) {
             header('Location: ../pages/success.php');

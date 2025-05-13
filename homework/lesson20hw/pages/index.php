@@ -1,11 +1,18 @@
 <?php
-session_start();
 
+namespace project;
+
+use classes\User as User;
+use ORM\Users as TableUsers;
+use ORM\UserInfo as TableUserInfo;
+
+session_start();
 ini_set('MEMORY_LIMIT', '128M');
 include_once '../../../addons/functions.php';
 require_once '../classes/User.php';
 require_once '../classes/Registration.php';
-require_once '../classes/Authorisation.php';
+require_once '../classes/Authorization.php';
+
 
 //Проверяем, если пользователь авторизован, то перенаправляем его в личный кабинет.
 $user = User::getInstance();
@@ -32,10 +39,12 @@ if (isset($_GET['action']) && $_GET['action'] == 'registration') {
 <form method="post" action="../addons/form-handler.php" enctype="multipart/form-data">
     <input type="email" name="login" id="login">
     <label for="login">Login</label>
-    <?php br() ?>
+    <?php
+    br() ?>
     <input type="password" name="password" id="password">
     <label for="password">Password</label>
-    <?php br();
+    <?php
+    br();
     isset($avatar_upload_field) ? print_r($avatar_upload_field) : '';
     ?>
     <button type="submit" name="action" value="<?= $btn_action ?>"><?= $btn_desc ?></button>
